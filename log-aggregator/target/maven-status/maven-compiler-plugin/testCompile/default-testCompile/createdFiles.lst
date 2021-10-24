@@ -1,0 +1,6 @@
+local\tin\tests\log\aggregates\LogEntriesPoolTest.class
+local\tin\tests\log\aggregates\tasks\AppenderTest.class
+local\tin\tests\log\aggregates\LogEntriesPoolWrapper.class
+local\tin\tests\log\aggregates\LogEntryWrapperToo.class
+local\tin\tests\log\aggregates\LogEntryTest.class
+local\tin\tests\log\aggregates\LogEntryWrapper.class
