@@ -1,14 +1,10 @@
 package local.tin.tests.log.aggregates;
 
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import local.tin.tests.log.aggregates.tasks.Appender;
+import local.tin.tests.log.aggregates.tasks.Finalizer;
 import local.tin.tests.log.aggregates.tasks.Initializer;
-import local.tin.tests.log.aggregates.tasks.Task;
 
 /**
  *
@@ -39,15 +35,41 @@ public abstract class LogEntriesExecutor<L extends LogEntry> implements ILogEntr
             throw new LogException("UUID: " + logStep.getId() + ", already present.");
         }
         
-        Initializer initializer = new Initializer(getNewLogEntryInstance(), logStep);
-        Future<LogEntry> futureInitializer = executorService.submit(initializer);    
-        try {
-            getLogEntriesPool().put(logStep.getId(), (L) futureInitializer.get());
-        } catch (InterruptedException | ExecutionException ex) {
-           throw new LogException(ex);
-        }
+        LogEntry logEntry = getNewLogEntryInstance();
+        Initializer initializer = new Initializer(logEntry, logStep);
+        executorService.submit(initializer);    
+        getLogEntriesPool().put(logStep.getId(), (L) logEntry);
+       
+        return logStep;
+    }
+
+    @Override
+    public LogStep append(LogStep logStep) throws LogException {
+        if (logStep.getId() == null || (logStep.getId() != null && getLogEntriesPool().get(logStep.getId()) == null)) {
+            throw new LogException("UUID: " + logStep.getId() + ", not present.");
+        } 
+        
+        LogEntry logEntry = getLogEntriesPool().get(logStep.getId());
+        Appender appender = new Appender(logEntry, logStep);
+        executorService.submit(appender);    
+        getLogEntriesPool().put(logStep.getId(), (L) logEntry);     
         
         return logStep;
     }
 
+    @Override
+    public LogStep finalize(LogStep logStep) throws LogException {
+        if (logStep.getId() == null || (logStep.getId() != null && getLogEntriesPool().get(logStep.getId()) == null)) {
+            throw new LogException("UUID: " + logStep.getId() + ", not present.");
+        } 
+        
+        LogEntry logEntry = getLogEntriesPool().get(logStep.getId());
+        Finalizer finalizer = new Finalizer(logEntry, logStep);
+        executorService.submit(finalizer);    
+        getLogEntriesPool().put(logStep.getId(), (L) logEntry);
+
+        return logStep;
+    }
+
+    
 }
