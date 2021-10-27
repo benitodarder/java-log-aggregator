@@ -13,6 +13,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.powermock.reflect.Whitebox;
@@ -44,6 +45,7 @@ public class LogEntriesExecutorTest {
         Whitebox.setInternalState(logEntriesExecutor, "executorService", mockedExecutorService);
         mockedLogStep = mock(LogStep.class);
         mockcedFutureInitializer = mock(Future.class);
+        reset(mockedLogEntriesPool);
     }
 
     @Test
@@ -76,7 +78,7 @@ public class LogEntriesExecutorTest {
         
         logEntriesExecutor.initialize(mockedLogStep);
 
-        verify(mockedExecutorService).submit(any(Initializer.class));
+        verify(mockedLogEntriesPool).put(SAMPLE_UUID, mockedLogEntry);
     }
     
    @Test(expected = LogException.class)
