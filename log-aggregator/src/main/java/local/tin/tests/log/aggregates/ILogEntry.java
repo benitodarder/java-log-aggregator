@@ -48,7 +48,7 @@ public interface ILogEntry {
     /**
      * Returns log entry identifier.
      * 
-     * @return UUID.
+     * @return String.
      */
-    public UUID getId();
+    public String getId();
 }

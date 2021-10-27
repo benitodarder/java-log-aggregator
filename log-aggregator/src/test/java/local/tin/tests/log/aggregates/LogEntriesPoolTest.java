@@ -13,7 +13,7 @@ import static org.mockito.Mockito.mock;
  */
 public class LogEntriesPoolTest {
 
-    private static final UUID SAMPLE_UUID = UUID.randomUUID();
+    private static final String SAMPLE_UUID = UUID.randomUUID().toString();
     private LogEntriesPool logEntriesPool;
     private LogEntry mockedLogEntry;
 

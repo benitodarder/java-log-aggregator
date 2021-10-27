@@ -16,7 +16,7 @@ import static org.mockito.Mockito.when;
  */
 public class LogEntryTest {
 
-    private static final UUID SAMPLE_UUID = UUID.randomUUID();
+    private static final String SAMPLE_UUID = UUID.randomUUID().toString();
     private LogEntry logEntry;
     private LogStep mockedLogStep;
 

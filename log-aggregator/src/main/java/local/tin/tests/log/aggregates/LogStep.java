@@ -3,7 +3,6 @@ package local.tin.tests.log.aggregates;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.UUID;
 
 /**
  *
@@ -11,16 +10,16 @@ import java.util.UUID;
  */
 public class LogStep {
 
-    private UUID id;
+    private String id;
     private String message;
     private long timestamp;
     private Map<String, Object> additionals; 
 
-    public UUID getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(String id) {
         this.id = id;
     }
 

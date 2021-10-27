@@ -1,37 +1,36 @@
 package local.tin.tests.log.aggregates;
 
-import java.util.UUID;
-
 /**
  *
  * @author benitodarder
+ * @param <L>
  */
 public interface ILogEntriesPool<L extends LogEntry> {
     
     /**
      * Adds log entry to the pool. Throws exception when already present.
      * 
-     * @param uuid as UUID.
+     * @param id as String.
      * @param logEntry as extension of LogEntry.
      * @throws LogException 
      */
-    public void put(UUID uuid, L logEntry) throws LogException;
+    public void put(String id, L logEntry) throws LogException;
     
     /**
      * Returns log entry from the pool.
      * 
-     * @param uuid as UUID.
+     * @param id as String.
      * @return logEntry as extension of LogEntry.
      */    
-    public L get(UUID uuid);
+    public L get(String id);
     
     /**
      * Removes log entry from the pool.
      * 
-     * @param uuid as UUID.
+     * @param id as String.
      * @return logEntry as extension of LogEntry.
      */      
-    public L remove(UUID uuid);
+    public L remove(String id);
     
      /**
      * Empties the pool.

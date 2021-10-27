@@ -1,8 +1,6 @@
 package local.tin.tests.log.aggregates.spring.boot.filters;
 
 import java.io.IOException;
-import java.util.UUID;
-import java.util.logging.Level;
 import org.springframework.stereotype.Component;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -17,6 +15,7 @@ import local.tin.tests.log.aggregates.LogStep;
 import local.tin.tests.log.aggregates.spring.boot.logging.Sl4jEntriesExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -26,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Component
 public class SimpleFilterToo implements Filter {
 
+    public static final String HEADER_X_REQUEST_ID = "X-Request-Id";
     private static final Logger LOGGER = LoggerFactory.getLogger(SimpleFilterToo.class);
 
     @Autowired
@@ -49,27 +49,32 @@ public class SimpleFilterToo implements Filter {
             SimpleHttServletResponseWrapper responseWrapper = new SimpleHttServletResponseWrapper(httpResponse);
             String requestBody = requestWrapper.getContent();
             long t0 = System.currentTimeMillis();
-
+            
             try {
                 LogStep logStep = new LogStep();
                 logStep.setMessage(requestBody);
+                String xRequestId = httpRequest.getHeader(HEADER_X_REQUEST_ID);
+                if (xRequestId != null) { 
+                    logStep.setId(xRequestId);
+                }                
                 sl4jEntriesExecutor.initialize(logStep);
-                UUID uuid = logStep.getId();
+                String logStepId = logStep.getId();
+                MDC.put(HEADER_X_REQUEST_ID, logStepId);
                 try {
                     logStep = new LogStep();
-                    logStep.setId(uuid);
+                    logStep.setId(logStepId);
                     logStep.setMessage("Before doFilter");
                     sl4jEntriesExecutor.append(logStep);
                     filterChain.doFilter(requestWrapper, responseWrapper);
                     logStep = new LogStep();
-                    logStep.setId(uuid);
+                    logStep.setId(logStepId);
                     logStep.setMessage(responseWrapper.getContent());
                     sl4jEntriesExecutor.finalize(logStep);
                     httpResponse.getOutputStream().write(responseWrapper.getContentAsBytes());
 
                 } catch (Exception e) {
                     logStep = new LogStep();
-                    logStep.setId(uuid);
+                    logStep.setId(logStepId);
                     logStep.setMessage(e.getMessage());
 
                     sl4jEntriesExecutor.finalize(logStep);
@@ -78,6 +83,8 @@ public class SimpleFilterToo implements Filter {
                 }
             } catch (LogException ex) {
                 LOGGER.error("Wow!", ex);
+            } finally {
+                MDC.remove(HEADER_X_REQUEST_ID);
             }
 
         }

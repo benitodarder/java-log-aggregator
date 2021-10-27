@@ -8,24 +8,22 @@ import java.util.UUID;
  */
 public abstract class LogEntry implements ILogEntry {
 
-    private UUID uuid;
+    private String id;
 
     protected abstract void initializeSpecifics(LogStep logstep);
 
     @Override
     public void initialize(LogStep logstep) throws LogException {
         if (logstep.getId() == null) {
-            uuid = UUID.randomUUID();
-            logstep.setId(uuid);
-        } else {
-            uuid = logstep.getId();
-        }
+            logstep.setId(UUID.randomUUID().toString());
+        } 
+        id = logstep.getId();
         initializeSpecifics(logstep);
     }
 
     @Override
-    public UUID getId() {
-        return uuid;
+    public String getId() {
+        return id;
     }
 
 }

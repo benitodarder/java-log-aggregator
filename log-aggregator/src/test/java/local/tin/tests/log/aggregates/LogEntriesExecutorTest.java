@@ -24,7 +24,7 @@ import org.powermock.reflect.Whitebox;
  */
 public class LogEntriesExecutorTest {
 
-    private static final UUID SAMPLE_UUID = UUID.randomUUID();
+    private static final String SAMPLE_UUID = UUID.randomUUID().toString();
     protected static ILogEntriesPool mockedLogEntriesPool;
     protected static LogEntry mockedLogEntry;
     private LogEntriesExecutor logEntriesExecutor;

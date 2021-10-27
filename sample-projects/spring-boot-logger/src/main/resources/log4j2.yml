@@ -1,0 +1,24 @@
+Configuration:
+  status: warn
+  monitorInterval: 30
+  Appenders:
+    Console:
+      - name: Default
+        PatternLayout:
+          Pattern: "%d{yyyy-MM-dd'T'HH:mm:ss.SSSZ} [%-5level] [%tid] [%C{1}] %m%n"
+      - name: Log-aggregates
+        PatternLayout:
+          Pattern: "%n===================================================%n%d{yyyy-MM-dd'T'HH:mm:ss.SSSZ} [%-5level] [%X{X-Request-Id}] [%tid] %m%n"
+  Loggers:
+    Root:
+      level: info
+      AppenderRef:
+        - ref: Default
+    Logger:
+      - name: Log-aggregates
+        level: info
+        additivity: false
+        AppenderRef:
+          - ref: Log-aggregates
+
+

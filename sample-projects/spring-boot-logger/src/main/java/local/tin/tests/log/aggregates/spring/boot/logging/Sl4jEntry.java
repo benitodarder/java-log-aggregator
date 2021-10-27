@@ -5,6 +5,7 @@ import local.tin.tests.log.aggregates.LogException;
 import local.tin.tests.log.aggregates.LogStep;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 /**
  *
@@ -12,7 +13,8 @@ import org.slf4j.LoggerFactory;
  */
 public class Sl4jEntry extends LogEntry {
     
-    private static final Logger LOGGER = LoggerFactory.getLogger(Sl4jEntry.class);
+    private static final Logger LOGGER_DEBUG = LoggerFactory.getLogger(Sl4jEntry.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger("Log-aggregates");
     private StringBuilder lines;
     
     @Override
@@ -28,7 +30,8 @@ public class Sl4jEntry extends LogEntry {
 
     @Override
     public void finalize(LogStep logstep) throws LogException {
-        lines.append("Finalizing log entry:").append(logstep.getMessage()).append(System.lineSeparator());
+        MDC.put("X-Request-Id", logstep.getId());
+        lines.append("Finalizing log entry:").append(logstep.getMessage()).append(System.lineSeparator()).append("===================================================");
         LOGGER.info(lines.toString());
     }
     
