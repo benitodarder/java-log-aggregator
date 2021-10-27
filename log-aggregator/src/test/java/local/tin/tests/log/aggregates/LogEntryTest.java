@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -37,7 +38,7 @@ public class LogEntryTest {
 
     @Test
     public void initialize_assigns_new_uuid_when_not_set_in_log_step() throws LogException {
-        when(mockedLogStep.getId()).thenReturn(null);
+        when(mockedLogStep.getId()).thenReturn(null, SAMPLE_UUID);
 
         logEntry.initialize(mockedLogStep);
 
@@ -50,7 +51,7 @@ public class LogEntryTest {
 
         logEntry.initialize(mockedLogStep);
 
-        verify(mockedLogStep).setId(logEntry.getId());
+        verify(mockedLogStep).setId(anyString());
     }
 
     @Test

@@ -1,14 +1,9 @@
 package local.tin.tests.log.aggregates;
 
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import local.tin.tests.log.aggregates.tasks.Appender;
 import local.tin.tests.log.aggregates.tasks.Finalizer;
-import local.tin.tests.log.aggregates.tasks.Initializer;
 
 /**
  *
@@ -68,7 +63,7 @@ public abstract class LogEntriesExecutor<L extends LogEntry> implements ILogEntr
         LogEntry logEntry = getLogEntriesPool().get(logStep.getId());
         Finalizer finalizer = new Finalizer(logEntry, logStep);
         executorService.submit(finalizer);    
-        getLogEntriesPool().put(logStep.getId(), (L) logEntry);
+        getLogEntriesPool().remove(logStep.getId());
 
         return logStep;
     }

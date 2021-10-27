@@ -140,6 +140,18 @@ public class LogEntriesExecutorTest {
 
         verify(mockedExecutorService).submit(any(Finalizer.class));
     }     
+    
+    @Test
+    public void finalize_removes_from_pool() throws LogException, InterruptedException, ExecutionException {
+        when(mockedLogStep.getId()).thenReturn(SAMPLE_UUID);
+        when(mockedLogEntriesPool.get(SAMPLE_UUID)).thenReturn(mockedLogEntry);
+        when(mockedExecutorService.submit(any(Finalizer.class))).thenReturn(mockcedFutureInitializer);
+        when(mockcedFutureInitializer.get()).thenReturn(mockedLogEntry);
+        
+        logEntriesExecutor.finalize(mockedLogStep);
+
+        verify(mockedLogEntriesPool).remove(SAMPLE_UUID);
+    }      
 }
 
 class LogEntryWrapperToo extends LogEntry {

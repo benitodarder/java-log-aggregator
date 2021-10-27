@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding= "UTF-8"?>
+<!DOCTYPE Configuration>
+<Configuration>
+    <Appenders>
+        <Console name="STDOUT" target="SYSTEM_OUT">
+            <PatternLayout
+                pattern="%d{yyyy-MM-dd'T'HH:mm:ss.SSSZ} [%-5level] [%tid] [%C{1}] %m%n" />
+        </Console>
+        <Console name="LOG-AGGREGATES" target="SYSTEM_OUT">
+            <PatternLayout
+                pattern="%n===================================================%n%d{yyyy-MM-dd'T'HH:mm:ss.SSSZ} [%-5level] [%X{X-Request-Id}] [%tid] %m%n" />
+        </Console>        
+    </Appenders>
+    <Loggers>
+        <Logger name="LOG-AGGREGATES" level="INFO" additivity="false">>
+            <AppenderRef ref="LOG-AGGREGATES"  />
+        </Logger>
+        <Root level="INFO">
+            <AppenderRef ref="STDOUT"  />
+        </Root>
+    </Loggers>
+</Configuration>
