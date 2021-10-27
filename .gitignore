@@ -27,4 +27,3 @@ hs_err_pid*
 **/nbactions.xml
 **/nb-configuration.xml
 **/.idea
-/sample-projects/tomee-logger/target/
