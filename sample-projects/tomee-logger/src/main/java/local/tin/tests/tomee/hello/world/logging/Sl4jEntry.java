@@ -20,18 +20,18 @@ public class Sl4jEntry extends LogEntry {
     @Override
     protected void initializeSpecifics(LogStep logstep) {
        lines = new StringBuilder();
-       lines.append(System.lineSeparator()).append("Initializing log entry: ").append(logstep.getMessage()).append(System.lineSeparator());
+       lines.append(logstep.getMessage()).append(System.lineSeparator());
     }
 
     @Override
     public void append(LogStep logstep) throws LogException {
-        lines.append("Appending log entry:").append(logstep.getMessage()).append(System.lineSeparator());
+        lines.append(logstep.getMessage()).append(System.lineSeparator());
     }
 
     @Override
     public void finalize(LogStep logstep) throws LogException {
         MDC.put("X-Request-Id", logstep.getId());
-        lines.append("Finalizing log entry:").append(logstep.getMessage()).append(System.lineSeparator()).append("===================================================");
+        lines.append(logstep.getMessage()).append(System.lineSeparator()).append("===================================================");
         LOGGER.info(lines.toString());
     }
     

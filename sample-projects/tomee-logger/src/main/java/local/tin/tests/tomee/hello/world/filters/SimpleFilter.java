@@ -38,33 +38,33 @@ public class SimpleFilter implements javax.servlet.Filter {
             SimpleHttServletResponseWrapper responseWrapper = new SimpleHttServletResponseWrapper(httpResponse);
             String requestBody = requestWrapper.getContent();
             long t0 = System.currentTimeMillis();
-          
+
             try {
                 LogStep logStep = new LogStep();
-                logStep.setMessage(httpRequest.getMethod() + " " + httpRequest.getRequestURI() + " " +  httpRequest.getQueryString() + System.lineSeparator() +  "Request body:" + System.lineSeparator() + requestBody);
+                logStep.setMessage(getInitalMessage(httpRequest, requestBody));
                 String xRequestId = httpRequest.getHeader(HEADER_X_REQUEST_ID);
-                if (xRequestId != null) { 
+                if (xRequestId != null) {
                     logStep.setId(xRequestId);
-                }                
+                }
                 Sl4jEntriesExecutor.getInstance().initialize(logStep);
                 String logStepId = logStep.getId();
                 MDC.put(HEADER_X_REQUEST_ID, logStepId);
                 try {
                     logStep = new LogStep();
                     logStep.setId(logStepId);
-                    logStep.setMessage("Before doFilter");
+                    logStep.setMessage("Before doFilter!");
                     Sl4jEntriesExecutor.getInstance().append(logStep);
                     filterChain.doFilter(requestWrapper, responseWrapper);
                     logStep = new LogStep();
                     logStep.setId(logStepId);
-                    logStep.setMessage("Response body:" + System.lineSeparator() + responseWrapper.getContent());
+                    logStep.setMessage(getFinalMessage(responseWrapper.getContent()));
                     Sl4jEntriesExecutor.getInstance().finalize(logStep);
                     httpResponse.getOutputStream().write(responseWrapper.getContentAsBytes());
 
                 } catch (Exception e) {
                     logStep = new LogStep();
                     logStep.setId(logStepId);
-                    logStep.setMessage(e.getMessage());
+                    logStep.setMessage(getFinalMessage(e.getMessage()));
 
                     Sl4jEntriesExecutor.getInstance().finalize(logStep);
 
@@ -78,6 +78,32 @@ public class SimpleFilter implements javax.servlet.Filter {
 
         }
         LOGGER.info("SimpleFilterToo doFilter ends!");
+    }
+
+    public String getFinalMessage(String responseBody) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("-----------------------------------------------------------------------")
+                .append(System.lineSeparator())
+                .append("Response body:")
+                .append(System.lineSeparator())
+                .append(responseBody);
+        return stringBuilder.toString();
+    }
+
+    private String getInitalMessage(HttpServletRequest httpRequest, String requestBody) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(httpRequest.getMethod())
+                .append(" ")
+                .append(httpRequest.getRequestURI())
+                .append(" ")
+                .append(httpRequest.getQueryString())
+                .append(System.lineSeparator())
+                .append("Request body:")
+                .append(System.lineSeparator())
+                .append(requestBody)
+                .append(System.lineSeparator())
+                .append("-----------------------------------------------------------------------");
+        return stringBuilder.toString();
     }
 
     @Override

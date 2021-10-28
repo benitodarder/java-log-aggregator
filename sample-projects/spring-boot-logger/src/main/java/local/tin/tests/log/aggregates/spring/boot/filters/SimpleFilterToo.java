@@ -52,7 +52,7 @@ public class SimpleFilterToo implements Filter {
             
             try {
                 LogStep logStep = new LogStep();
-                logStep.setMessage(requestBody);
+                logStep.setMessage(getInitalMessage(httpRequest, requestBody));
                 String xRequestId = httpRequest.getHeader(HEADER_X_REQUEST_ID);
                 if (xRequestId != null) { 
                     logStep.setId(xRequestId);
@@ -68,14 +68,14 @@ public class SimpleFilterToo implements Filter {
                     filterChain.doFilter(requestWrapper, responseWrapper);
                     logStep = new LogStep();
                     logStep.setId(logStepId);
-                    logStep.setMessage(responseWrapper.getContent());
+                    logStep.setMessage(getFinalMessage(responseWrapper.getContent()));
                     sl4jEntriesExecutor.finalize(logStep);
                     httpResponse.getOutputStream().write(responseWrapper.getContentAsBytes());
 
                 } catch (Exception e) {
                     logStep = new LogStep();
                     logStep.setId(logStepId);
-                    logStep.setMessage(e.getMessage());
+                    logStep.setMessage(getFinalMessage(e.getMessage()));
 
                     sl4jEntriesExecutor.finalize(logStep);
 
@@ -96,4 +96,29 @@ public class SimpleFilterToo implements Filter {
         LOGGER.info("SimpleFilterToo destroyed!");
     }
 
+    public String getFinalMessage(String responseBody) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("-----------------------------------------------------------------------")
+                .append(System.lineSeparator())
+                .append("Response body:")
+                .append(System.lineSeparator())
+                .append(responseBody);
+        return stringBuilder.toString();
+    }
+
+    private String getInitalMessage(HttpServletRequest httpRequest, String requestBody) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(httpRequest.getMethod())
+                .append(" ")
+                .append(httpRequest.getRequestURI())
+                .append(" ")
+                .append(httpRequest.getQueryString())
+                .append(System.lineSeparator())
+                .append("Request body:")
+                .append(System.lineSeparator())
+                .append(requestBody)
+                .append(System.lineSeparator())
+                .append("-----------------------------------------------------------------------");
+        return stringBuilder.toString();
+    }    
 }

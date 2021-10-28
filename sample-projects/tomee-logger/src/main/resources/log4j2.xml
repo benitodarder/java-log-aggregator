@@ -6,10 +6,19 @@
             <PatternLayout
                 pattern="%d{yyyy-MM-dd'T'HH:mm:ss.SSSZ} [%-5level] [%tid] [%C{1}] %m%n" />
         </Console>
-        <Console name="LOG-AGGREGATES" target="SYSTEM_OUT">
-            <PatternLayout
-                pattern="%n===================================================%n%d{yyyy-MM-dd'T'HH:mm:ss.SSSZ} [%-5level] [%X{X-Request-Id}] [%tid] %m%n" />
-        </Console>        
+        <RollingFile
+            name="LOG-AGGREGATES"
+            fileName="../logs/LOG-AGGREGATES.log"
+            filePattern="../logs/LOG-AGGREGATES.%d{dd-MMM}.log.gz"
+            ignoreExceptions="false">
+            <PatternLayout>
+                <Pattern>%n===================================================%n%d{yyyy-MM-dd'T'HH:mm:ss.SSSZ} [%-5level] [%X{X-Request-Id}] [%tid] %m%n</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1"/>
+            </Policies>
+            <DefaultRolloverStrategy max="5" />
+        </RollingFile>               
     </Appenders>
     <Loggers>
         <Logger name="LOG-AGGREGATES" level="INFO" additivity="false">>
