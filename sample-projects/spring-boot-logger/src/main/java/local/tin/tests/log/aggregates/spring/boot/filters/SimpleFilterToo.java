@@ -49,14 +49,14 @@ public class SimpleFilterToo implements Filter {
             SimpleHttServletResponseWrapper responseWrapper = new SimpleHttServletResponseWrapper(httpResponse);
             String requestBody = requestWrapper.getContent();
             long t0 = System.currentTimeMillis();
-            
+
             try {
                 LogStep logStep = new LogStep();
                 logStep.setMessage(getInitalMessage(httpRequest, requestBody));
                 String xRequestId = httpRequest.getHeader(HEADER_X_REQUEST_ID);
-                if (xRequestId != null) { 
+                if (xRequestId != null) {
                     logStep.setId(xRequestId);
-                }                
+                }
                 sl4jEntriesExecutor.initialize(logStep);
                 String logStepId = logStep.getId();
                 MDC.put(HEADER_X_REQUEST_ID, logStepId);
@@ -68,14 +68,14 @@ public class SimpleFilterToo implements Filter {
                     filterChain.doFilter(requestWrapper, responseWrapper);
                     logStep = new LogStep();
                     logStep.setId(logStepId);
-                    logStep.setMessage(getFinalMessage(responseWrapper.getContent()));
+                    logStep.setMessage(getFinalMessage(httpResponse.getStatus(), responseWrapper.getContent()));
                     sl4jEntriesExecutor.finalize(logStep);
                     httpResponse.getOutputStream().write(responseWrapper.getContentAsBytes());
 
                 } catch (Exception e) {
                     logStep = new LogStep();
                     logStep.setId(logStepId);
-                    logStep.setMessage(getFinalMessage(e.getMessage()));
+                    logStep.setMessage(getFinalMessage(httpResponse.getStatus(), e.getMessage()));
 
                     sl4jEntriesExecutor.finalize(logStep);
 
@@ -96,10 +96,13 @@ public class SimpleFilterToo implements Filter {
         LOGGER.info("SimpleFilterToo destroyed!");
     }
 
-    public String getFinalMessage(String responseBody) {
+    public String getFinalMessage(int status, String responseBody) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("-----------------------------------------------------------------------")
                 .append(System.lineSeparator())
+                .append("Response status code: ")
+                .append(status)
+                .append(" ")
                 .append("Response body:")
                 .append(System.lineSeparator())
                 .append(responseBody);
@@ -110,15 +113,23 @@ public class SimpleFilterToo implements Filter {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(httpRequest.getMethod())
                 .append(" ")
-                .append(httpRequest.getRequestURI())
+                .append(httpRequest.getProtocol())
                 .append(" ")
-                .append(httpRequest.getQueryString())
-                .append(System.lineSeparator())
+                .append(httpRequest.getServerName())
+                .append(":")
+                .append(httpRequest.getServerPort())
+                .append(httpRequest.getRequestURI());
+        
+        if (httpRequest.getQueryString() != null) {
+            stringBuilder.append(httpRequest.getQueryString());
+        }
+        
+        stringBuilder.append(System.lineSeparator())
                 .append("Request body:")
                 .append(System.lineSeparator())
                 .append(requestBody)
                 .append(System.lineSeparator())
                 .append("-----------------------------------------------------------------------");
         return stringBuilder.toString();
-    }    
+    }
 }

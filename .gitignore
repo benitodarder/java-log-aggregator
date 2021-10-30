@@ -28,3 +28,4 @@ hs_err_pid*
 **/nb-configuration.xml
 **/.idea
 **/logs
+/sample-projects/spring-boot-logger/target/
